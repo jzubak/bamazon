@@ -15,95 +15,19 @@ connection.connect(function (err) {
 
     inquirer.prompt([
         {
-            type: "list",
-            name: "top5000search",
-            message: "What would you like to search for?",
-            choices: ["Artist Name", "Duplicate Artists", "Range", "Song Title"]
-
-
-        }]).then(function (choices) {
-            if (choices.top5000search === "Artist Name") {
-                artist()
-            }
-            if (choices.top5000search === "Duplicate Artists") {
-                duplicates()
-            }
-            if (choices.top5000search === "Range") {
-                range()
-            }
-            if (choices.top5000search === "Song Title") {
-                specificSong()
-            }
-        })
-
-    // A query which returns all data for songs sung by a specific artist
-    function artist() {
-        inquirer.prompt([
-            {
-                type: "input",
-                name: "artist_name",
-                message: "which artist do you want to search for?"
-            }]).then(function(artistquery) {
-                connection.query("select * from songs where artist = ?", artistquery.artist_name, function (err, res) {
+            type: "input",
+            name: "bamazon",
+            message: "What is the ID Number of the item you want to buy?"
+        }]).then(function(itemquery) {
+            console.log(itemquery)
+                connection.query("select * from products where item_id = ?", itemquery.bamazon, function (err, res) {
                     if (err) throw err;
                     for (var i = 0; i < res.length; i++) {
-                        console.log(res[i].position + " | " + res[i].artist + " | " + res[i].title + " | " + res[i].year + " | " + res[i].popularity_world + " | " + res[i].popularity_USA + " | " + res[i].popularity_UK + " | " + res[i].popularity_Europe + " | " + res[i].popularity_rest);
+                        console.log(res[i].item_id + " | " + res[i].product_name + " | " + res[i].department_name + " | " + res[i].price + " | " + res[i].stock_quantity);
                     }
                     connection.end();
                 })
             })
-        }
-    //A query which returns all artists who appear within the top 5000 more than once
-    function duplicates() {
-        connection.query("select position, artist, count(*) from songs group by artist having count(*)>1", function (err, res) {
-            if (err) throw err;
-            for (var i = 0; i < res.length; i++) {
-                console.log(res[i].position + " | " + res[i].artist + " | " + res[i].count);
-            }
-            connection.end();
-        })
-    }
-
-    //A query which returns all data contained within a specific range
-    function range() {
-        inquirer.prompt([
-            {
-                type: "input",
-                name: "range1",
-                message: "what is the start of the range do you want to see songs in?"
-            },
-            {
-                type: "input",
-                name: "range2",
-                message: "what is the end of the range do you want to see songs in?"
-            }])
-            .then(function(rangeSearch) {
-        connection.query("select distinct * from songs where position between ? and ?;", [rangeSearch.range1, rangeSearch.range2], function (err, res) {
-            if (err) throw err;
-            for (var i = 0; i < res.length; i++) {
-                console.log(res[i].position + " | " + res[i].artist + " | " + res[i].title + " | " + res[i].year + " | " + res[i].popularity_world + " | " + res[i].popularity_USA + " | " + res[i].popularity_UK + " | " + res[i].popularity_Europe + " | " + res[i].popularity_rest);
-            }
-            connection.end();
-        })
-    })
-    }
-
-    //A query which searches for a specific song in the top 5000 and returns the data for it
-    function specificSong() {
-        inquirer.prompt([
-            {
-                type: "input",
-                name: "song_name",
-                message: "which song do you want to search for?"
-            }]).then(function(songquery) {
-        connection.query("select distinct * from songs where title =?", songquery.song_name, function (err, res) {
-            if (err) throw err;
-            for (var i = 0; i < res.length; i++) {
-                console.log(res[i].position + " | " + res[i].artist + " | " + res[i].title + " | " + res[i].year + " | " + res[i].popularity_world + " | " + res[i].popularity_USA + " | " + res[i].popularity_UK + " | " + res[i].popularity_Europe + " | " + res[i].popularity_rest);
-            }
-            connection.end();
-        })
-    })
-    }
-});
+       
+    });
 
